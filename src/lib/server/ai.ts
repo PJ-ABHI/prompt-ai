@@ -11,6 +11,8 @@ export async function processPrompt(prompt: string, mode: string): Promise<strin
             return `[Corrected Version]:\n${prompt.replace(/\b(teh)\b/g, 'the').replace(/\b(wont)\b/g, "won't")} (Simulated AI Improvement)`;
         case 'email':
             return `Subject: Regarding your Request\n\nDear recipient,\n\n${prompt}\n\nBest regards,\n[Your Name]`;
+        case 'conversation':
+            return `[Correction]:\n${prompt.replace(/\b(i is)\b/gi, 'I am').replace(/\b(she don't)\b/gi, "she doesn't")} (Simulated Correction)\n\n[Feedback]:\nREMEMBER: 'I' is always followed by 'am', not 'is'.\n\n[AI Reply]:\nThat's a good start! What else would you like to talk about today?`;
         case 'description':
             return `Here is a compelling description based on "${prompt}":\n\nExperience the pinnacle of innovation with this groundbreaking concept. It seamlessly blends functionality with aesthetic perfection.`;
         case 'content':

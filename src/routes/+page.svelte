@@ -12,6 +12,7 @@
         { value: "email", label: "Generate Email", icon: "📧" },
         { value: "description", label: "Write Description", icon: "📝" },
         { value: "content", label: "Page Content", icon: "📄" },
+        { value: "conversation", label: "English Coach", icon: "🗣️" },
     ];
 </script>
 
