@@ -1,38 +1,29 @@
-# sv
+# PromptAI
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/PJ-ABHI/prompt-ai)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPJ-ABHI%2Fprompt-ai)
 
-## Creating a project
+PromptAI is a beautifully designed SvelteKit application for processing text prompts with AI.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```sh
-# create a new project in the current directory
-npx sv create
+- **Gamme Correction**: Fix typos and grammar instantly.
+- **Email Generation**: Draft professional emails from brief prompts.
+- **Content Creation**: Generate descriptions and web content.
+- **Premium UI**: Glassmorphism design with smooth animations.
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Development
 
-## Developing
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Deployment
 
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This app uses `adapter-auto` and can be easily deployed to Vercel, Netlify, or Cloudflare Pages.
