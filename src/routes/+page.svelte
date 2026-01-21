@@ -7,13 +7,70 @@
     let loading = $state(false);
     let currentMode = $state("correct");
 
+    import { onMount, onDestroy } from "svelte";
+
     const options = [
-        { value: "correct", label: "Correct Grammar", icon: "✨" },
-        { value: "email", label: "Generate Email", icon: "📧" },
-        { value: "description", label: "Write Description", icon: "📝" },
-        { value: "content", label: "Page Content", icon: "📄" },
+        { value: "correct", label: "Prompt Coach", icon: "✨" },
         { value: "conversation", label: "English Coach", icon: "🗣️" },
     ];
+
+    let promptText = $state("");
+    let isListening = $state(false);
+    let recognition: any = null;
+
+    function toggleSpeech() {
+        if (!recognition) {
+            alert("Speech recognition is not supported in this browser.");
+            return;
+        }
+
+        if (isListening) {
+            recognition.stop();
+            isListening = false;
+        } else {
+            recognition.start();
+            isListening = true;
+        }
+    }
+
+    onMount(() => {
+        if (
+            "webkitSpeechRecognition" in window ||
+            "SpeechRecognition" in window
+        ) {
+            // @ts-ignore
+            const SpeechRecognition =
+                (window as any).SpeechRecognition ||
+                (window as any).webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = "en-US";
+
+            recognition.onresult = (event: any) => {
+                let finalTranscript = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (finalTranscript) {
+                    // Append with a space if there's already text
+                    promptText =
+                        promptText + (promptText ? " " : "") + finalTranscript;
+                }
+            };
+
+            recognition.onerror = (event: any) => {
+                console.error("Speech recognition error", event.error);
+                isListening = false;
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+            };
+        }
+    });
 </script>
 
 <svelte:head>
@@ -25,79 +82,100 @@
     <p class="subtitle">Enter a prompt and let our AI handle the rest.</p>
 </div>
 
-<div class="glass-panel editor-card">
-    <form
-        method="POST"
-        use:enhance={() => {
-            loading = true;
-            return async ({ update }) => {
-                await update();
-                loading = false;
-            };
-        }}
-    >
-        <div class="toolbar">
-            {#each options as option}
-                <label
-                    class="mode-option"
-                    class:active={currentMode === option.value}
+<div class="workspace">
+    <div class="glass-panel editor-card">
+        <form
+            method="POST"
+            use:enhance={() => {
+                loading = true;
+                return async ({ update }) => {
+                    await update();
+                    loading = false;
+                };
+            }}
+        >
+            <div class="toolbar">
+                {#each options as option}
+                    <label
+                        class="mode-option"
+                        class:active={currentMode === option.value}
+                    >
+                        <input
+                            type="radio"
+                            name="mode"
+                            value={option.value}
+                            bind:group={currentMode}
+                        />
+                        <span class="icon">{option.icon}</span>
+                        <span class="label">{option.label}</span>
+                    </label>
+                {/each}
+            </div>
+
+            <div class="input-area">
+                <textarea
+                    name="prompt"
+                    bind:value={promptText}
+                    placeholder="Enter your text or prompt here..."
+                    rows="12"
+                    class="input-field"
+                    required
+                ></textarea>
+                <button
+                    type="button"
+                    class="mic-btn"
+                    class:listening={isListening}
+                    onclick={toggleSpeech}
+                    aria-label="Voice Input"
+                    title="Click to speak"
                 >
-                    <input
-                        type="radio"
-                        name="mode"
-                        value={option.value}
-                        bind:group={currentMode}
-                    />
-                    <span class="icon">{option.icon}</span>
-                    <span class="label">{option.label}</span>
-                </label>
-            {/each}
-        </div>
+                    {#if isListening}
+                        <span class="pulse"></span> 🛑
+                    {:else}
+                        🎤
+                    {/if}
+                </button>
+            </div>
 
-        <div class="input-area">
-            <textarea
-                name="prompt"
-                placeholder="Enter your text or prompt here..."
-                rows="8"
-                class="input-field"
-                required
-            ></textarea>
-        </div>
-
-        <div class="actions">
-            <button type="submit" class="btn-primary" disabled={loading}>
-                {#if loading}
-                    <span class="spinner"></span> Generating...
-                {:else}
-                    Generate Result
-                {/if}
-            </button>
-        </div>
-    </form>
-</div>
-
-{#if form?.result}
-    <div class="result-section glass-panel">
-        <div class="result-header">
-            <h3>Result</h3>
-            <span class="tag">{form.mode}</span>
-        </div>
-        <div class="result-content">
-            <pre>{form.result}</pre>
-        </div>
+            <div class="actions">
+                <button type="submit" class="btn-primary" disabled={loading}>
+                    {#if loading}
+                        <span class="spinner"></span> Generating...
+                    {:else}
+                        Generate Result
+                    {/if}
+                </button>
+            </div>
+        </form>
     </div>
-{/if}
+
+    {#if form?.result}
+        <div class="result-section glass-panel">
+            <div class="result-header">
+                <h3>Result</h3>
+                <span class="tag">{form.mode}</span>
+            </div>
+            <div class="result-content">
+                <pre>{form.result}</pre>
+            </div>
+        </div>
+    {:else}
+        <div class="placeholder-section">
+            <!-- Optional placeholder for the result side -->
+        </div>
+    {/if}
+</div>
 
 <style>
     .hero {
         text-align: center;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
     }
 
     h1 {
-        font-size: 3.5rem;
+        font-size: 3rem;
         font-weight: 700;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
         line-height: 1.2;
     }
 
@@ -109,14 +187,32 @@
 
     .subtitle {
         color: var(--color-text-muted);
-        font-size: 1.25rem;
+        font-size: 1.125rem;
+    }
+
+    /* Workspace Split Layout */
+    .workspace {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    @media (min-width: 1024px) {
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: start;
+            gap: 2rem;
+        }
     }
 
     .editor-card {
         width: 100%;
-        max-width: 800px;
-        margin-bottom: 2rem;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Match height */
+        min-height: 500px;
     }
 
     .toolbar {
@@ -158,14 +254,22 @@
 
     .input-area {
         padding: 1.5rem;
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
 
     textarea {
         background: transparent;
         border: none;
-        resize: vertical;
+        resize: none; /* Disable manual resize as we want it to fill */
         font-size: 1.1rem;
         color: #fff;
+        height: 100%;
+        min-height: 300px;
+        flex: 1;
+        font-family: "Outfit", sans-serif;
     }
 
     textarea:focus {
@@ -183,8 +287,11 @@
 
     .result-section {
         width: 100%;
-        max-width: 800px;
         animation: slideUp 0.4s ease-out;
+        height: 100%;
+        min-height: 500px; /* Match editor min-height */
+        display: flex;
+        flex-direction: column;
     }
 
     .result-header {
@@ -207,7 +314,8 @@
 
     .result-content {
         padding: 1.5rem;
-        overflow-x: auto;
+        overflow-y: auto;
+        flex: 1;
     }
 
     pre {
@@ -225,6 +333,49 @@
         to {
             opacity: 1;
             transform: translateY(0);
+        }
+    }
+
+    .mic-btn {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 10;
+        font-size: 1.2rem;
+    }
+
+    .mic-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+    .mic-btn.listening {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+        color: #ef4444;
+        animation: pulse-ring 2s infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
         }
     }
 </style>

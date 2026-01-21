@@ -1,6 +1,6 @@
 <script lang="ts">
-	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import "../app.css";
+	import favicon from "$lib/assets/favicon.svg";
 
 	let { children } = $props();
 </script>
@@ -13,7 +13,7 @@
 	<header>
 		<nav class="container">
 			<a href="/" class="logo">Prompt<span class="highlight">AI</span></a>
-            <div class="user-status">v1.0</div>
+			<div class="user-status">v1.1</div>
 		</nav>
 	</header>
 	<main class="container">
@@ -38,39 +38,39 @@
 		z-index: 10;
 	}
 
-    nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+	nav {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
 
 	.logo {
 		font-size: 1.75rem;
 		font-weight: 700;
 		letter-spacing: -0.03em;
-        background: linear-gradient(to right, #fff, #94a3b8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+		background: linear-gradient(to right, #fff, #94a3b8);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
 	}
 
 	.highlight {
 		color: var(--color-primary);
-        -webkit-text-fill-color: var(--color-primary);
+		-webkit-text-fill-color: var(--color-primary);
 	}
 
-    .user-status {
-        font-size: 0.875rem;
-        color: var(--color-text-muted);
-        background: rgba(255,255,255,0.05);
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-    }
+	.user-status {
+		font-size: 0.875rem;
+		color: var(--color-text-muted);
+		background: rgba(255, 255, 255, 0.05);
+		padding: 0.25rem 0.75rem;
+		border-radius: 1rem;
+	}
 
 	main {
 		flex: 1;
 		padding: 3rem 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Center content */
+		display: flex;
+		flex-direction: column;
+		align-items: center; /* Center content */
 	}
 </style>
